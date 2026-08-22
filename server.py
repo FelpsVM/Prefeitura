@@ -1,11 +1,29 @@
 import os
+import sys
 
+from dotenv import load_dotenv
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 
 from data import dataControl
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-troque-em-producao")
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
+if not SECRET_KEY:
+    sys.exit(
+        "ERRO: variavel de ambiente SECRET_KEY nao definida.\n"
+        "Gere uma com:\n"
+        '  python3 -c "import secrets; print(secrets.token_hex(32))"\n'
+        "e defina SECRET_KEY no arquivo .env."
+    )
+app.secret_key = SECRET_KEY
+
+
+@app.errorhandler(500)
+def handle_internal_error(error):
+    return jsonify({"success": False, "message": "Erro interno do servidor."}), 500
 
 @app.route('/register')
 def register():
@@ -89,4 +107,6 @@ def updateNotifications():
 
 if __name__ == '__main__':
     dataControl.init_db()
-    app.run(debug=True)
+
+    debug_mode = 0
+    app.run(debug=debug_mode)

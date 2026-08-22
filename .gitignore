@@ -2,3 +2,5 @@
 venv
 data/database.db
 data/__pycache__
+notes.txt
+.env

@@ -10,6 +10,18 @@ DB_PATH = os.path.join(BASE_DIR, "database.db")
 
 EMAIL_REGEX = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+
+def _as_text(value):
+    """
+    Garante que o valor e uma string antes de usar .strip()/.lower().
+
+    O front-end deveria sempre mandar string, mas o JSON de entrada nao
+    e confiavel: alguem pode mandar um numero, uma lista, um objeto, etc.
+    Sem essa checagem, um .strip() em algo que nao e string derruba a
+    rota inteira com um erro 500 nao tratado.
+    """
+    return value if isinstance(value, str) else ""
+
 @contextmanager
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -60,9 +72,10 @@ def create_user(name: str, email: str, phone: str, password: str):
 
     Retorna uma tupla (success: bool, message: str, user_id: int | None)
     """
-    name = (name or "").strip()
-    email = (email or "").strip().lower()
-    phone = (phone or "").strip()
+    name = _as_text(name).strip()
+    email = _as_text(email).strip().lower()
+    phone = _as_text(phone).strip()
+    password = _as_text(password)
 
     if not name:
         return False, "O nome e obrigatorio.", None
@@ -104,7 +117,7 @@ def get_user_by_email(email: str):
                    notify_email, notify_sms, notify_whatsapp
             FROM users WHERE email = ?
             """,
-            ((email or "").strip().lower(),),
+            (_as_text(email).strip().lower(),),
         ).fetchone()
 
         if row is None:
@@ -134,7 +147,7 @@ def update_notification_prefs(email: str, notify_email: bool, notify_sms: bool, 
             WHERE email = ?
             """,
             (int(bool(notify_email)), int(bool(notify_sms)), int(bool(notify_whatsapp)),
-             (email or "").strip().lower()),
+             _as_text(email).strip().lower()),
         )
 
         if cursor.rowcount == 0:
@@ -150,16 +163,19 @@ def authenticate_user(email: str, password: str):
     Retorna o usuario (sem o hash) em caso de sucesso, ou None se as
     credenciais forem invalidas.
     """
+    email = _as_text(email).strip().lower()
+    password = _as_text(password)
+
     with get_connection() as conn:
         row = conn.execute(
             "SELECT * FROM users WHERE email = ?",
-            ((email or "").strip().lower(),),
+            (email,),
         ).fetchone()
 
     if row is None:
         return None
 
-    if not check_password_hash(row["password_hash"], password or ""):
+    if not check_password_hash(row["password_hash"], password):
         return None
 
     user = dict(row)
