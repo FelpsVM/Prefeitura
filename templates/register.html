@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Registar</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}" />
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+
+    <div class="card__header">
+      <h1>Criar conta</h1>
+      <p>Preencha os seus dados para se registar.</p>
+    </div>
+
+    <form action="#" method="post">
+
+      <div class="field">
+        <label for="name">Nome</label>
+        <input type="text" id="name" name="name" placeholder="O seu nome" required autocomplete="name" />
+      </div>
+
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" placeholder="o.seu@email.com" required autocomplete="email" />
+      </div>
+
+      <div class="field">
+        <label for="phone">Telefone</label>
+        <input type="tel" id="phone" name="phone" placeholder="(00) 00000-0000" required autocomplete="tel" />
+      </div>
+
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required minlength="8" autocomplete="new-password" />
+      </div>
+
+      <button class="submit" id="registerBTN">Criar conta</button>
+
+    </form>
+
+    <div class="switch">
+      Já tem conta? <a href="{{ url_for('login') }}">Entrar</a>
+    </div>
+
+  </div>
+</div>
+</body>
+<script src="./templates/register.js"></script>
+</html>
