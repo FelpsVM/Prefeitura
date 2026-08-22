@@ -48,8 +48,7 @@ function login(email, password) {
         clearError();
         console.log("Login realizado:", result.data.user);
 
-        // Redirecione para a página desejada após o login.
-        // window.location.href = "/dashboard";
+        window.location.href = "/perfil";
     })
     .catch(function(error) {
         console.error("Erro:", error);

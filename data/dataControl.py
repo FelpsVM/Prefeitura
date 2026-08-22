@@ -31,12 +31,15 @@ def init_db():
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS users (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                name          TEXT    NOT NULL,
-                email         TEXT    NOT NULL UNIQUE,
-                phone         TEXT    NOT NULL,
-                password_hash TEXT    NOT NULL,
-                created_at    TEXT    NOT NULL DEFAULT (datetime('now'))
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                name            TEXT    NOT NULL,
+                email           TEXT    NOT NULL UNIQUE,
+                phone           TEXT    NOT NULL,
+                password_hash   TEXT    NOT NULL,
+                notify_email    INTEGER NOT NULL DEFAULT 1,
+                notify_sms      INTEGER NOT NULL DEFAULT 0,
+                notify_whatsapp INTEGER NOT NULL DEFAULT 0,
+                created_at      TEXT    NOT NULL DEFAULT (datetime('now'))
             )
             """
         )
@@ -96,10 +99,48 @@ def get_user_by_email(email: str):
     """Retorna o registro do usuario (sem o hash da senha) ou None."""
     with get_connection() as conn:
         row = conn.execute(
-            "SELECT id, name, email, phone, created_at FROM users WHERE email = ?",
+            """
+            SELECT id, name, email, phone, created_at,
+                   notify_email, notify_sms, notify_whatsapp
+            FROM users WHERE email = ?
+            """,
             ((email or "").strip().lower(),),
         ).fetchone()
-        return dict(row) if row else None
+
+        if row is None:
+            return None
+
+        user = dict(row)
+        user["notify_email"] = bool(user["notify_email"])
+        user["notify_sms"] = bool(user["notify_sms"])
+        user["notify_whatsapp"] = bool(user["notify_whatsapp"])
+        return user
+
+
+def update_notification_prefs(email: str, notify_email: bool, notify_sms: bool, notify_whatsapp: bool):
+    """
+    Atualiza os canais de aviso do usuario.
+
+    Ao menos um canal precisa ficar ativo. Retorna (success: bool, message: str).
+    """
+    if not (notify_email or notify_sms or notify_whatsapp):
+        return False, "Pelo menos um canal de aviso precisa ficar ativo."
+
+    with get_connection() as conn:
+        cursor = conn.execute(
+            """
+            UPDATE users
+            SET notify_email = ?, notify_sms = ?, notify_whatsapp = ?
+            WHERE email = ?
+            """,
+            (int(bool(notify_email)), int(bool(notify_sms)), int(bool(notify_whatsapp)),
+             (email or "").strip().lower()),
+        )
+
+        if cursor.rowcount == 0:
+            return False, "Usuario nao encontrado."
+
+        return True, "Preferencias atualizadas!"
 
 
 def authenticate_user(email: str, password: str):

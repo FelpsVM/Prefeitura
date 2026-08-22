@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Meu Perfil</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='perfil.css') }}" />
+</head>
+<body>
+
+<div class="page">
+  <div class="card">
+
+    <div class="card__header">
+      <h1>Meu Perfil</h1>
+      <p>Gerencie os seus dados e preferências.</p>
+    </div>
+
+    <!-- Seletor de seções -->
+    <nav class="tabs" role="tablist">
+      <button
+        type="button"
+        class="tab active"
+        data-tab="conta"
+        role="tab"
+        aria-selected="true"
+      >
+        Conta
+      </button>
+      <button
+        type="button"
+        class="tab"
+        data-tab="avisos"
+        role="tab"
+        aria-selected="false"
+      >
+        Avisos
+      </button>
+    </nav>
+
+    <!-- ===================== SEÇÃO: CONTA ===================== -->
+    <div id="secao-conta" class="tab-content" role="tabpanel">
+
+      <!-- Dados do usuário (sem senha) -->
+      <section class="block">
+        <h2>Meus dados</h2>
+
+        <div class="info-row">
+          <span class="info-label">Nome</span>
+          <span class="info-value" id="infoName">—</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">E-mail</span>
+          <span class="info-value" id="infoEmail">—</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Telefone</span>
+          <span class="info-value" id="infoPhone">—</span>
+        </div>
+
+        <div class="info-row">
+          <span class="info-label">Membro desde</span>
+          <span class="info-value" id="infoCreatedAt">—</span>
+        </div>
+      </section>
+
+      <!-- Canais de envio de avisos (mínimo 1 sempre ativo) -->
+      <section class="block">
+        <h2>Receber avisos por</h2>
+        <p class="block__hint">Pelo menos uma opção precisa ficar ativa.</p>
+
+        <div class="channel-group" id="channelGroup">
+          <button
+            type="button"
+            class="channel-btn"
+            data-channel="email"
+            aria-pressed="false"
+          >
+            E-mail
+          </button>
+          <button
+            type="button"
+            class="channel-btn"
+            data-channel="sms"
+            aria-pressed="false"
+          >
+            SMS
+          </button>
+          <button
+            type="button"
+            class="channel-btn"
+            data-channel="whatsapp"
+            aria-pressed="false"
+          >
+            WhatsApp
+          </button>
+        </div>
+      </section>
+
+      <!-- Alterar senha (botão ainda sem função) -->
+      <section class="block">
+        <h2>Segurança</h2>
+
+        <div class="password-row">
+          <div>
+            <p class="password-row__title">Senha</p>
+            <p class="password-row__hint">••••••••</p>
+          </div>
+          <button type="button" class="btn-secondary" id="changePasswordBTN">
+            Alterar senha
+          </button>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ===================== SEÇÃO: AVISOS ===================== -->
+    <div id="secao-avisos" class="tab-content" role="tabpanel" hidden>
+      <!-- Conteúdo dos avisos será adicionado aqui. -->
+    </div>
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='perfil.js') }}"></script>
+</body>
+</html>
